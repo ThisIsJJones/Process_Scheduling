@@ -28,16 +28,15 @@ int main(){
   	if (myfile.is_open()){
 		getline(myfile, line); //remove first line
     		while ( getline (myfile, line) ){ 
-			istringstream iss(line);
-			string pid, burst, arrival, priority, deadline, io; 
-			getline(iss, pid, ' ');
-			getline(iss, burst, ' ');
-			getline(iss, arrival, ' ');
-			getline(iss, priority, ' ');
-			getline(iss, deadline, ' ');
-			getline(iss, io, ' ');
-			Process* proc = new Process(stoi(pid), stoi(burst), stoi(arrival), stoi(priority), stoi(deadline), stoi(io));
-
+                istringstream iss(line);
+                string pid, burst, arrival, priority, deadline, io;
+                getline(iss, pid, ' ');
+                getline(iss, burst, ' ');
+                getline(iss, arrival, ' ');
+                getline(iss, priority, ' ');
+                getline(iss, deadline, ' ');
+                getline(iss, io, ' ');
+                Process* proc = new Process(stoi(pid), stoi(burst), stoi(arrival), stoi(priority), stoi(deadline), stoi(io));
     		}
     		myfile.close();
   	}else 
