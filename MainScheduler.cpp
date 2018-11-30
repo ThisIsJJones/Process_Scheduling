@@ -7,14 +7,15 @@
 #include <queue>
 #include "Process.h"
 #include "MFQS.h"
+#include "RTS.h"
 using namespace std;
 
 vector<Process*> createProcesses(){
     vector<Process*> processes;
 
     string line;
-    ifstream myfile ("process_input.txt");
-//      ifstream myfile ("process_input.txt");
+//    ifstream myfile ("test_input.txt");
+      ifstream myfile ("process_input.txt");
 
     if (myfile.is_open()){
         getline(myfile, line); //remove first line
@@ -94,6 +95,11 @@ int main(int argc, char * argv[]){
             sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
             
             MFQS(processes, fs);
+        }else if(read == "2"){
+            //RTS
+            vector<Process*> processes = createProcesses();
+            sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+            RTS(processes, fs);
         }
         
         cout << "\n";

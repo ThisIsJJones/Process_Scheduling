@@ -1,0 +1,97 @@
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <queue>
+#include <fstream>
+#include <math.h>
+#include <string>
+#include <algorithm>
+#include <functional>   // std::greater
+#include "Process.h"
+#include "RTS.h"
+using namespace std;
+
+void RTS(vector<Process*> processes, fstream& fs){
+    
+    int RTS_TIMER = 0;
+    
+    bool haveProcess = false;
+    int master_waitTime = 0;
+    int master_completed = 0;
+    int master_turnaround = 0;
+    int number_removed = 0;
+    
+    //order queue
+    priority_queue<Process, vector<Process>, greater<vector<Process>::value_type> >  priority_queue;
+    
+    Process current_process;
+    
+//    while(processes.back() != NULL && processes.back()->arrival <= RTS_TIMER){
+//        Process* proc = processes.back();
+//        priority_queue.push( *proc );
+//        delete proc;
+//        processes.pop_back();
+//    }
+//
+//    while (priority_queue.size() > 0) {
+//        cout << priority_queue.top().pid << " " << priority_queue.top().priority << " " <<  priority_queue.top().deadline << "\n";
+//        priority_queue.pop();
+//    }
+    
+    while(processes.size() != 0 || priority_queue.size() != 0){
+        while(processes.back() != NULL && processes.back()->arrival == RTS_TIMER){
+            Process* proc = processes.back();
+            priority_queue.push( *proc );
+            delete proc;
+            processes.pop_back();
+        }
+        
+        if(haveProcess){
+            if(priority_queue.top() != current_process){//are we still the top process
+                //grab the new process that has come in
+                current_process = priority_queue.top();//grab the lowest priority with earliest deadline and earliest burst
+                priority_queue.pop();//remove
+            }else{
+                 priority_queue.pop();//remove
+            }
+        }else if(priority_queue.size() > 0){
+            //grab the top process
+            current_process = priority_queue.top(); //grab the lowest priority with earliest deadline
+            priority_queue.pop();//remove
+            haveProcess = true;
+        }else{
+            //we don't have a process and there is nothing in the queue
+            haveProcess = false;
+        }
+        
+        if(haveProcess){
+            //do we have a process
+            if(RTS_TIMER >= current_process.deadline
+               || (RTS_TIMER+current_process.burst) > current_process.deadline) {
+                //clock tick is already after the deadline
+                //don't do anything
+                haveProcess = false;
+                number_removed++;
+                fs << "\tremoved due to having a deadline already passed\n";
+            }else{
+                current_process.burst--;
+                if(current_process.burst == 0){
+                    //process has finished
+                    master_completed++;
+                    haveProcess = false;
+                }else{
+                    //it didn't finish its burst so add it back to the queue
+                    priority_queue.push(current_process);
+                }
+            }
+            
+        }
+        
+        RTS_TIMER++;
+    }
+    
+    
+    cout << number_removed << "\n";
+    cout << master_completed << "\n";
+    
+}

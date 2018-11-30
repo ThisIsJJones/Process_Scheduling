@@ -15,7 +15,10 @@ public:
     int waitingTime;
 
 	Process(int pid, int burst, int arrival, int priority, int deadline, int io);
-    
+    Process();
+    friend bool operator != (const Process& lhs, const Process& rhs);
+    friend bool operator < (const Process& lhs, const Process& rhs);
+    friend bool operator > (const Process& lhs, const Process& rhs);
 };
 
 
