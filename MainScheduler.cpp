@@ -66,17 +66,27 @@ bool compare(const Process* l, const Process* r){
     return l->arrival > r->arrival;
 }
 
+inline bool isInteger(const string& s){
+    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+    
+    char * p;
+    strtol(s.c_str(), &p, 10);
+    
+    return (*p == 0);
+}
+
 
 int main(int argc, char * argv[]){
 //    vector<Process*> processes = createProcesses();
 //    sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
     
     
-    string read = "";
+    string readInOption = "";
+    string outputFileName = "test.txt";
     
     fstream fs;
-    fs.open("test.txt", std::fstream::in | std::fstream::out  | std::fstream::trunc );
-    while(read != "Exit" && read != "5"){
+    fs.open(outputFileName, std::fstream::in | std::fstream::out  | std::fstream::trunc );
+    while(readInOption != "5"){
         fs << flush; // print everything in the buffer
         cout << "Enter the number of the scheduling algorithm you would like to use?\n";
         cout << "\tMFQS: 1\n";
@@ -85,26 +95,47 @@ int main(int argc, char * argv[]){
         cout << "\tCreate process: 4\n";
         cout << "\tExit: 5\n";
         cout << "Option: ";
-        cin >> read;
+        cin >> readInOption;
     
-    
-        
-        if(read == "1"){
-            //MFQS
-            vector<Process*> processes = createProcesses();
-            sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-            
-            MFQS(processes, fs);
-        }else if(read == "2"){
-            //RTS
-            vector<Process*> processes = createProcesses();
-            sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-            RTS(processes, fs);
+        int option = -1;
+        if(isInteger(readInOption)){
+            option = stoi(readInOption);
         }
         
-        cout << "\n";
-        cout << "\n";
+        vector<Process*> processes;
         
+        switch(option){
+            case 1:
+                //MFQS
+                processes = createProcesses();
+                sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+                
+                MFQS(processes, fs);
+                cout << "read output in file: " << outputFileName << "\n";
+                break;
+            case 2:
+                //RTS
+                processes = createProcesses();
+                sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+                RTS(processes, fs);
+                cout << "read output in file: " << outputFileName << "\n";
+                break;
+            case 3:
+                //WHS
+                break;
+            case 4:
+                //CREATE PROCESS
+                
+                break;
+            case 5:
+                //exit
+                break;
+            default:
+                
+                cout << "\nPlease enter an option: 1, 2, 3, 4, or 5";
+                break;
+        }
+        cout << "\n";
     }
      fs.close();
 

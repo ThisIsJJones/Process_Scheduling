@@ -96,7 +96,7 @@ void RTS(vector<Process*> processes, fstream& fs){
     }
     
     
-    cout << number_removed << "\n";
-    cout << master_completed << "\n";
+    fs << "\nAmount Removed: " << number_removed << "\n";
+    fs << "\nAmount Completed: " <<  master_completed << "\n";
     
 }
