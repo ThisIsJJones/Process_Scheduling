@@ -20,6 +20,7 @@ void RTS(vector<Process*> processes, fstream& fs){
     int master_completed = 0;
     int master_turnaround = 0;
     int number_removed = 0;
+    int executingTime = 0;
     
     //order queue
     priority_queue<Process, vector<Process>, greater<vector<Process>::value_type> >  priority_queue;
@@ -49,13 +50,13 @@ void RTS(vector<Process*> processes, fstream& fs){
         if(haveProcess){
             if(priority_queue.top() != current_process){//are we still the top process
                 //grab the new process that has come in
-                current_process = priority_queue.top();//grab the lowest priority with earliest deadline and earliest burst
-                priority_queue.pop();//remove
-            }else{
-                 priority_queue.pop();//remove
+                current_process = priority_queue.top();//grab the lowest priority with earliest deadline
+                executingTime=0;
             }
+            priority_queue.pop();//remove
         }else if(priority_queue.size() > 0){
             //grab the top process
+            executingTime=0;
             current_process = priority_queue.top(); //grab the lowest priority with earliest deadline
             priority_queue.pop();//remove
             haveProcess = true;
@@ -65,23 +66,27 @@ void RTS(vector<Process*> processes, fstream& fs){
         }
         
         if(haveProcess){
-            //do we have a process
+             fs << "Executing process " << current_process.pid << " with burst " << current_process.burst << " and deadline " << current_process.deadline << " at clock tick " << RTS_TIMER << "\n";
+            executingTime++;
+            //we have a process
             if(RTS_TIMER >= current_process.deadline
                || (RTS_TIMER+current_process.burst) > current_process.deadline) {
                 //clock tick is already after the deadline
                 //don't do anything
                 haveProcess = false;
                 number_removed++;
-                fs << "\tremoved due to having a deadline already passed\n";
+                fs << "\tRemoved due to having a deadline already passed or that will pass before its burst\n";
             }else{
                 current_process.burst--;
                 if(current_process.burst == 0){
                     //process has finished
                     master_completed++;
+                     fs << "\tFinished from " << (RTS_TIMER-executingTime)+1 << " through " << RTS_TIMER << "\n";
                     haveProcess = false;
                 }else{
                     //it didn't finish its burst so add it back to the queue
                     priority_queue.push(current_process);
+                    fs << "\tDidn't Finish\n";
                 }
             }
             
