@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string>
 #include <queue>
+#include <algorithm>
 #include "Process.h"
 #include "MFQS.h"
 #include "RTS.h"
@@ -19,11 +20,11 @@ vector<Process*> createProcesses(){
 
     if (myfile.is_open()){
         getline(myfile, line); //remove first line
-        
+
         while ( getline (myfile, line) ){
             istringstream iss(line); // make line a stream
             string pid, burst, arrival, priority, deadline, io;
-            
+
             //get process input
             getline(iss, pid, '\t');
             getline(iss, burst, '\t');
@@ -31,7 +32,7 @@ vector<Process*> createProcesses(){
             getline(iss, priority, '\t');
             getline(iss, deadline, '\t');
             getline(iss, io, '\t');
-            
+
             //convert to int
             int pid_ = stoi(pid);
             int burst_ = stoi(burst);
@@ -39,8 +40,8 @@ vector<Process*> createProcesses(){
             int priority_ = stoi(priority);
             int deadline_ = stoi(deadline);
             int io_ = stoi(io);
-            
-            
+
+
             //sanitize input
             if(pid_ >= 0 &&
                burst_ >= 0 &&
@@ -48,12 +49,12 @@ vector<Process*> createProcesses(){
                priority_ >= 0 &&
                deadline_ >= 0 &&
                io_ >= 0){
-                
+
                 //create process
                 Process* proc = new Process(pid_, burst_, arrival_, priority_, deadline_, io_);
                 processes.push_back(proc);
             }
-            
+
         }
         myfile.close();
     }else{
@@ -68,10 +69,10 @@ bool compare(const Process* l, const Process* r){
 
 inline bool isInteger(const string& s){
     if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
-    
+
     char * p;
     strtol(s.c_str(), &p, 10);
-    
+
     return (*p == 0);
 }
 
@@ -79,11 +80,11 @@ inline bool isInteger(const string& s){
 int main(int argc, char * argv[]){
 //    vector<Process*> processes = createProcesses();
 //    sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-    
-    
+
+
     string readInOption = "";
-    string outputFileName = "test.txt";
-    
+    string outputFileName = "output.txt";
+
     fstream fs;
     fs.open(outputFileName, std::fstream::in | std::fstream::out  | std::fstream::trunc );
     while(readInOption != "5"){
@@ -96,20 +97,20 @@ int main(int argc, char * argv[]){
         cout << "\tExit: 5\n";
         cout << "Option: ";
         cin >> readInOption;
-    
+
         int option = -1;
         if(isInteger(readInOption)){
             option = stoi(readInOption);
         }
-        
+
         vector<Process*> processes;
-        
+
         switch(option){
             case 1:
                 //MFQS
                 processes = createProcesses();
                 sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-                
+
                 MFQS(processes, fs);
                 cout << "read output in file: " << outputFileName << "\n";
                 break;
@@ -125,13 +126,13 @@ int main(int argc, char * argv[]){
                 break;
             case 4:
                 //CREATE PROCESS
-                
+
                 break;
             case 5:
                 //exit
                 break;
             default:
-                
+
                 cout << "\nPlease enter an option: 1, 2, 3, 4, or 5";
                 break;
         }
