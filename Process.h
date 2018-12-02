@@ -8,12 +8,14 @@ public:
     int master_burst;
 	int burst;
 	int arrival;
+    int master_priority;
 	int priority;
 	int deadline;
 	int io;
     int age;
     int waitingTime;
-
+    int queue_arrival;
+    
 	Process(int pid, int burst, int arrival, int priority, int deadline, int io);
     Process();
     friend bool operator != (const Process& lhs, const Process& rhs);

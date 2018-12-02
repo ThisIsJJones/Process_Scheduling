@@ -6,10 +6,11 @@ Process::Process(){
 
 Process::Process(int pid, int burst, int arrival, int priority, int deadline, int io)
 		: pid(pid), burst(burst), arrival(arrival), priority(priority), deadline(deadline), io(io){
-       master_burst = burst;
-            
+            master_burst = burst;
+            master_priority = priority;
             age = 0;
             waitingTime = 0;
+            queue_arrival = 0;
 }
 
 bool operator != (const Process& lhs, const Process& rhs){

@@ -8,6 +8,7 @@
 #include "Process.h"
 #include "MFQS.h"
 #include "RTS.h"
+#include "WHS.h"
 using namespace std;
 
 vector<Process*> createProcesses(){
@@ -126,6 +127,10 @@ int main(int argc, char * argv[]){
                 break;
             case 3:
                 //WHS
+                processes = createProcesses();
+                sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+                
+                WHS(processes, fs);
                 break;
             case 4: {
                 //CREATE PROCESS
