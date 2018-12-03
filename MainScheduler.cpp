@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string>
 #include <queue>
+#include <algorithm>
 #include "Process.h"
 #include "MFQS.h"
 #include "RTS.h"
