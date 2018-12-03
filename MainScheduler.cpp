@@ -110,7 +110,7 @@ int main(int argc, char * argv[]){
             case 1:
                 //MFQS
                 processes = createProcesses();
-                processes.insert(processes.end(), createdProcesses.begin(), createdProcesses.end());
+//                processes.insert(processes.end(), createdProcesses.begin(), createdProcesses.end());
                 sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
                 
                 MFQS(processes, fs);
@@ -119,7 +119,7 @@ int main(int argc, char * argv[]){
             case 2:
                 //RTS
                 processes = createProcesses();
-                processes.push_back( createdProcesses.back() );
+//                processes.push_back( createdProcesses.back() );
                 //                processes.insert(processes.end(), createdProcesses.begin(), createdProcesses.end());
                 sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
                 RTS(processes, fs);
@@ -129,7 +129,7 @@ int main(int argc, char * argv[]){
                 //WHS
                 processes = createProcesses();
                 sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-                
+                cout << "starting WHS\n";
                 WHS(processes, fs);
                 break;
             case 4: {
