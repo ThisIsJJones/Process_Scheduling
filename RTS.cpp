@@ -42,7 +42,7 @@ void RTS(vector<Process*> processes, fstream& fs){
     //    }
     
     while(processes.size() != 0 || priority_queue.size() != 0){
-        while(processes.back() != NULL && processes.back()->arrival == RTS_TIMER){
+        while(processes.size() != 0 && processes.back()->arrival == RTS_TIMER){
             Process* proc = processes.back();
             priority_queue.push( *proc );
             delete proc;
