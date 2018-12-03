@@ -1,5 +1,5 @@
 run : MainScheduler.cpp Process.o MFQS.o RTS.o WHS.o
-	g++ -o ./scheduler MainScheduler.cpp Process.o MFQS.o RTS.o WHS.o 
+	g++ -std=c++11 -o ./scheduler MainScheduler.cpp Process.o MFQS.o RTS.o WHS.o 
 
 Process.o : Process.h Process.cpp
 	g++ -c Process.h Process.cpp 
