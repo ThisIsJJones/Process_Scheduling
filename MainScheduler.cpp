@@ -12,12 +12,13 @@
 #include "WHS.h"
 using namespace std;
 
-vector<Process*> createProcesses(){
+vector<Process*> createProcesses(string filename){
     vector<Process*> processes;
     
     string line;
     //    ifstream myfile ("test_input.txt");
-    ifstream myfile ("process_input.txt");
+    //    ifstream myfile ("process_input.txt");
+    ifstream myfile(filename);
     
     if (myfile.is_open()){
         getline(myfile, line); //remove first line
@@ -59,7 +60,7 @@ vector<Process*> createProcesses(){
         }
         myfile.close();
     }else{
-        cout << "Unable to open file";
+        cout << "Unable to open file\n";
     }
     return processes;
 }
@@ -84,13 +85,20 @@ int main(int argc, char * argv[]){
     
     
     string readInOption = "";
-    string outputFileName = "output.txt";
+    string mfqs_output_fileName = "mfqs_output.txt";
+    string rts_output_fileName = "rts_output.txt";
+    string whs_output_fileName = "whs_output.txt";
     
-    fstream fs;
-    fs.open(outputFileName, std::fstream::in | std::fstream::out  | std::fstream::trunc );
+    fstream mfqs_output_file;
+    fstream rts_output_file;
+    fstream whs_output_file;
+    
+    
+    cout << "\n\nWELCOME TO THE PROCESS SCHEDULER!\n\n";
+    
     vector<Process*> createdProcesses;
     while(readInOption != "5"){
-        fs << flush; // print everything in the buffer
+        
         cout << "Enter the number of the scheduling algorithm you would like to use?\n";
         cout << "\tMFQS: 1\n";
         cout << "\tRTS: 2\n";
@@ -99,7 +107,7 @@ int main(int argc, char * argv[]){
         cout << "\tExit: 5\n";
         cout << "Option: ";
         cin >> readInOption;
-        
+        cout << "\n";
         int option = -1;
         if(isInteger(readInOption)){
             option = stoi(readInOption);
@@ -108,30 +116,137 @@ int main(int argc, char * argv[]){
         vector<Process*> processes;
         
         switch(option){
-            case 1:
+            case 1: {
                 //MFQS
-                processes = createProcesses();
-//                processes.insert(processes.end(), createdProcesses.begin(), createdProcesses.end());
-                sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
                 
-                MFQS(processes, fs);
-                cout << "read output in file: " << outputFileName << "\n";
+                
+                string file_creation = "";
+                
+                cout << "What input should we use?\n";
+                cout << "filename: ";
+                cin >> file_creation;
+                
+                processes = createProcesses(file_creation);
+                if(processes.size() > 0){
+                    for(int i = 0; i < createdProcesses.size(); i++){
+                        Process OG_PROC = *(createdProcesses[i]);
+                        Process* proc = new Process(OG_PROC.pid, OG_PROC.burst, OG_PROC.arrival, OG_PROC.priority, OG_PROC.deadline, OG_PROC.io);
+                        processes.push_back( proc );
+                    }
+                    sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+                    
+                    
+                    cout << "Starting MFQS...\n";
+                    
+                    string time_quantum = "";
+                    string nQueues = "";
+                    string age_interval = "";
+                    
+                    cout << "We need some info first:\n";
+                    cout << "Time quantum: ";
+                    cin >> time_quantum;
+                    cout << "Number of Queues: ";
+                    cin >> nQueues;
+                    cout << "Age Interval: ";
+                    cin >> age_interval;
+                    
+                    if(isInteger(time_quantum) &&
+                       stoi(time_quantum) > 0 &&
+                       isInteger(nQueues) &&
+                       stoi(nQueues) <= 5 &&
+                       stoi(nQueues) > 0 &&
+                       isInteger(age_interval) &&
+                       stoi(age_interval) > 0){
+                        
+                        mfqs_output_file.open(mfqs_output_fileName, std::fstream::out  | std::fstream::trunc );
+                        MFQS(processes, mfqs_output_file, stoi(time_quantum), stoi(age_interval), stoi(nQueues));
+                        mfqs_output_file << "\n";
+                        cout << "read output in file: " << mfqs_output_fileName << "\n";
+                        mfqs_output_file << flush; // print everything in the buffer
+                        mfqs_output_file.close();
+                    }else{
+                        cout << "Invalid input.\n";
+                    }
+                }
+                
                 break;
-            case 2:
+            }
+                break;
+            case 2: {
                 //RTS
-                processes = createProcesses();
-//                processes.push_back( createdProcesses.back() );
-                //                processes.insert(processes.end(), createdProcesses.begin(), createdProcesses.end());
-                sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-                RTS(processes, fs);
-                cout << "read output in file: " << outputFileName << "\n";
+                string file_creation = "";
+                
+                cout << "What input should we use?\n";
+                cout << "filename: ";
+                cin >> file_creation;
+                
+                processes = createProcesses(file_creation);
+                if(processes.size() > 0){
+                    for(int i = 0; i < createdProcesses.size(); i++){
+                        Process OG_PROC = *(createdProcesses[i]);
+                        Process* proc = new Process(OG_PROC.pid, OG_PROC.burst, OG_PROC.arrival, OG_PROC.priority, OG_PROC.deadline, OG_PROC.io);
+                        processes.push_back( proc );
+                    }
+                    sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+                    
+                    cout << "Starting RTS...\n";
+                    
+                    rts_output_file.open(rts_output_fileName, std::fstream::out  | std::fstream::trunc );
+                    
+                    
+                    RTS(processes, rts_output_file);
+                    cout << "read output in file: " << rts_output_fileName << "\n";
+                    rts_output_file << "\n";
+                    rts_output_file << flush; // print everything in the buffer
+                    rts_output_file.close();
+                }
+                
                 break;
-            case 3:
+            }
+                break;
+            case 3: {
                 //WHS
-                processes = createProcesses();
-                sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
-                cout << "starting WHS\n";
-                WHS(processes, fs);
+                string file_creation = "";
+                
+                cout << "What input should we use?\n";
+                cout << "filename: ";
+                cin >> file_creation;
+                
+                processes = createProcesses(file_creation);
+                if(processes.size() > 0){
+                    for(int i = 0; i < createdProcesses.size(); i++){
+                        Process OG_PROC = *(createdProcesses[i]);
+                        Process* proc = new Process(OG_PROC.pid, OG_PROC.burst, OG_PROC.arrival, OG_PROC.priority, OG_PROC.deadline, OG_PROC.io);
+                        processes.push_back( proc );
+                    }
+                    sort(processes.begin(), processes.end(), compare); //sort the processes by arrival, last is 0
+                    
+                    whs_output_file.open(whs_output_fileName, std::fstream::out  | std::fstream::trunc );
+                    
+                    cout << "Starting WHS...\n";
+                    
+                    string time_quantum = "";
+                    string age_interval = "";
+                    
+                    cout << "We need some info first:\n";
+                    cout << "Time quantum: ";
+                    cin >> time_quantum;
+                    cout << "Age Interval: ";
+                    cin >> age_interval;
+                    
+                    if(isInteger(time_quantum) &&
+                       stoi(time_quantum) > 0 &&
+                       isInteger(age_interval) &&
+                       stoi(age_interval) > 0){
+                        WHS(processes, whs_output_file, stoi(time_quantum), stoi(age_interval));
+                        cout << "read output in file: " << whs_output_fileName << "\n";
+                        whs_output_file << "\n";
+                        whs_output_file << flush; // print everything in the buffer
+                        whs_output_file.close();
+                    }
+                }
+                break;
+            }
                 break;
             case 4: {
                 //CREATE PROCESS
@@ -181,7 +296,6 @@ int main(int argc, char * argv[]){
         }
         cout << "\n";
     }
-    fs.close();
     
     return 0;
 }

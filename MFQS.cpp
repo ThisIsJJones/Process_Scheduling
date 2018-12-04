@@ -33,29 +33,25 @@ void age_FCFS(vector<queue<Process*> >& vector_queues, int age_interval, int amo
 }
 
 
-void MFQS(vector<Process*> processes, fstream& fs){
+void MFQS(vector<Process*> processes, fstream& fs, int time_quantum_, int age_interval_, int nQueues_){
     //an array of queues
     //with an index pointing to which queue we are currently at
     int queue_index = 0;
-    queue<Process*> queue1;
-    queue<Process*> queue2;
-    queue<Process*> queue3;
-    queue<Process*> queue4;
-
+    
     vector<queue<Process*> > vector_queues;
-    vector_queues.push_back(queue1);
-    vector_queues.push_back(queue2);
-    vector_queues.push_back(queue3);
-    vector_queues.push_back(queue4);
+    for(int i = 0; i < nQueues_; i++){
+        queue<Process*> queue;
+        vector_queues.push_back( queue );
+    }
 
 
     Process* cpu_process = NULL;
 
     int MFQS_timer = 0;
-    const int master_time_quantum = 100;
+    const int master_time_quantum = time_quantum_;
     int master_queue_time_quantum = 0;
     int time_quantum = master_time_quantum;
-    int age_interval = 25;
+    int age_interval = age_interval_;
     unsigned long long int master_waitTime = 0;
     unsigned long long int master_completed = 0;
     unsigned long long int master_turnaround = 0;
@@ -98,7 +94,7 @@ void MFQS(vector<Process*> processes, fstream& fs){
             master_turnaround += cpu_process->waitingTime + cpu_process->master_burst;
             master_waitTime += cpu_process->waitingTime; //when the process dies add its waiting time
 
-            //fs << "Process " << cpu_process->pid << " ran from " << MFQS_timer - (master_queue_time_quantum-amountToAge) << " through " << MFQS_timer-1 << " in queue " << queue_index << " and has finished\n";
+            fs << "Process " << cpu_process->pid << " ran from " << MFQS_timer - (master_queue_time_quantum-amountToAge) << " through " << MFQS_timer-1 << " in queue " << queue_index << " and has finished\n";
 
             vector_queues[vector_queues.size()-1].pop();
             delete cpu_process;
@@ -122,7 +118,7 @@ void MFQS(vector<Process*> processes, fstream& fs){
                 master_turnaround += cpu_process->waitingTime + cpu_process->master_burst;
                 master_waitTime += cpu_process->waitingTime; //when the process dies add its waiting time
 
-                //                fs << "Process " << cpu_process->pid << " ran from " << MFQS_timer << " through " << (amountToAge + MFQS_timer)-1 << " in queue " << queue_index << " and has finished\n";
+                fs << "Process " << cpu_process->pid << " ran from " << MFQS_timer << " through " << (amountToAge + MFQS_timer)-1 << " in queue " << queue_index << " and has finished\n";
 
                 vector_queues[queue_index].pop();
                 delete cpu_process;
@@ -139,19 +135,28 @@ void MFQS(vector<Process*> processes, fstream& fs){
                 Process* proc = cpu_process;
                 vector_queues[queue_index].pop();
                 vector_queues[queue_index+1].push( proc );//add the current process to the queue below
-                //                    fs << "Process " << proc->pid << " ran from " << (amountToAge+MFQS_timer)-master_queue_time_quantum << " through " << (amountToAge+MFQS_timer)-1 << " in queue " << queue_index << " and has been demoted to queue " << queue_index+1 << "\n";
+                fs << "Process " << proc->pid << " ran from " << (amountToAge+MFQS_timer)-master_queue_time_quantum << " through " << (amountToAge+MFQS_timer)-1 << " in queue " << queue_index << " and has been demoted to queue " << queue_index+1 << "\n";
 
             }
 
             MFQS_timer += amountToAge;//time has elapsed
         }
-        cout << MFQS_timer << "\n";
+//        cout << MFQS_timer << "\n";
     }
 
     fs << "\nStats:\n";
     fs << "Total wait time: " << master_waitTime << "\n";
+    fs << "Total turnaround time: " << master_turnaround << "\n";
     fs << "Total completed: " << master_completed << "\n";
     fs << "Average turn around time: " << master_turnaround/master_completed << "\n";
     fs << "Average wait time: " << master_waitTime/master_completed << "\n";
+    
+    
+//Stats:
+//    Total wait time: 250079386287
+//    Total turnaround time: 250084415080
+//    Total completed: 99700
+//    Average turn around time: 2508369
+//    Average wait time: 2508318
 }
 

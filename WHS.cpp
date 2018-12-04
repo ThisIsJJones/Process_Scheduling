@@ -10,12 +10,12 @@
 #include "WHS.h"
 using namespace std;
 
-void WHS(vector<Process*> processes, fstream& fs){
+void WHS(vector<Process*> processes, fstream& fs, int time_quantum_, int age_interval_){
     
     int WHS_TIMER = 0;
-    const int master_time_quantum = 50;
-    int time_quantum = 50;
-    int age_interval = 100;
+    const int master_time_quantum = time_quantum_;
+    int time_quantum = master_time_quantum;
+    int age_interval = age_interval_;
     
     bool running = false;
     vector<deque<Process*> > process_deck;
@@ -39,12 +39,13 @@ void WHS(vector<Process*> processes, fstream& fs){
     int aging_quantity = 0;
     
     while(processes.size() != 0 || process_in_queues != 0){
-        cout << "clock tick "<< WHS_TIMER << "\n";
+//        cout << "clock tick "<< WHS_TIMER << "\n";
         while(processes.size() != 0 && processes.back()->arrival == WHS_TIMER){
             Process* proc = processes.back();
             process_deck[proc->priority].push_back( proc );
             processes.pop_back();
             process_in_queues++;
+//            fs << "Process " << proc->pid << " arrived into queue " << proc->priority << " at clock tick " << WHS_TIMER<<"\n";
             if(proc->priority < 10){
                 aging_quantity++;
                 proc->queue_arrival = WHS_TIMER;//determine what time it entered aging queues
@@ -102,7 +103,7 @@ void WHS(vector<Process*> processes, fstream& fs){
                 }
                 
                 process_deck[newPriority].push_back(process_on_front);
-                
+                fs << "Process " << process_on_front->pid << " has exited the I/O queue and entered run queue " << newPriority << " at clock tick " << WHS_TIMER<<"\n";
                 if(newPriority > top_dawg){
                     top_dawg = newPriority;
                 }
@@ -147,6 +148,7 @@ void WHS(vector<Process*> processes, fstream& fs){
             if(time_quantum==1 && current_process->io > 0){
                 //we are on the last quantum
                 //do I/O
+                fs << "Process " << current_process->pid << " ran from clock tick " << WHS_TIMER - (master_time_quantum - 1) << " through " << WHS_TIMER << " and entered the I/O queue\n";
                 if(current_process->priority < 10){
                     aging_quantity--;
                 }
@@ -161,7 +163,7 @@ void WHS(vector<Process*> processes, fstream& fs){
                 if(current_process->burst==0){
                     //we dead
                     running = false;
-                    
+                    fs << "Process " << current_process->pid << " ran from clock tick " << WHS_TIMER- (master_time_quantum - time_quantum) - 1 << " through " <<WHS_TIMER << " and finished\n";
                     master_waitTime += (WHS_TIMER - current_process->arrival) - current_process->master_burst;
                     master_turnaround += (WHS_TIMER - current_process->arrival);
                     master_completed++;
@@ -180,6 +182,7 @@ void WHS(vector<Process*> processes, fstream& fs){
                         newPriority = current_process->master_priority;
                         //                        fs << current_process->priority - master_time_quantum<<"\n";
                     }
+                    fs << "Process " << current_process->pid << " ran from clock tick " << WHS_TIMER - master_time_quantum << " through " <<WHS_TIMER-1 << " in queue " << current_process->priority<<" and was demoted to queue " << newPriority << "\n";
                     process_deck[newPriority].push_back(current_process);
                     current_process->priority = newPriority;
                     if(newPriority < 10){
@@ -215,9 +218,18 @@ void WHS(vector<Process*> processes, fstream& fs){
     
     fs << "\nStats:\n";
     fs << "Total wait time: " << master_waitTime << "\n";
+    fs << "Total turnaround time: " << master_turnaround << "\n";
     fs << "Total completed: " << master_completed << "\n";
     fs << "Average turn around time: " << master_turnaround/master_completed << "\n";
     fs << "Average wait time: " << master_waitTime/master_completed << "\n";
+    
+    
+//Stats:
+//    Total wait time: 252072879267
+//    Total turnaround time: 252077908060
+//    Total completed: 99700
+//    Average turn around time: 2528364
+//    Average wait time: 2528313
     
 }
 

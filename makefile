@@ -20,4 +20,4 @@ clean:
 	rm ./scheduler
 	rm Process.o
 	rm *.h.gch
-	rm output.txt
+	rm *output.txt

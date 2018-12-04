@@ -5,7 +5,7 @@
 #include <fstream>
 using namespace std;
 
-void WHS(vector<Process*> processes, fstream& fs);
+void WHS(vector<Process*> processes, fstream& fs, int time_quantum_, int age_interval_);
 
 
 
